@@ -1,0 +1,23 @@
+[
+  {
+    "id": 1,
+    "title": "Первый пост",
+    "description": "Это описание первого поста",
+    "image": "https://docs.google.com/document/d/1QLJdaydEMDRsv4vDzK7bzpSoJF0N21BI/edit",
+    "likes": 12
+  },
+  {
+    "id": 2,
+    "title": "Второй пост",
+    "description": "Описание второго поста",
+    "image": "https://docs.google.com/document/d/1QLJdaydEMDRsv4vDzK7bzpSoJF0N21BI/edit",
+    "likes": 25
+  },
+  {
+    "id": 3,
+    "title": "Третий пост",
+    "description": "Описание третьего поста",
+    "image": "https://docs.google.com/document/d/1QLJdaydEMDRsv4vDzK7bzpSoJF0N21BI/edit",
+    "likes": 8
+  }
+]
