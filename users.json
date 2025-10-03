@@ -1,0 +1,20 @@
+[
+  {
+    "id": 1,
+    "name": "Анастасия",
+    "email": "nastya@gmail.com",
+    "password": "pass123"
+  },
+  {
+    "id": 2,
+    "name": "Иван",
+    "email": "ivan@gmail.com",
+    "password": "qwerty"
+  },
+  {
+    "id": 3,
+    "name": "Анастасия",
+    "email": "anast@gmail.com",
+    "password": "12345"
+  }
+]
