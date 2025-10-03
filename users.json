@@ -16,5 +16,10 @@
     "name": "Анастасия",
     "email": "anast@gmail.com",
     "password": "12345"
-  }
+  },
+  {
+  "title": "Новый пост",
+  "description": "Описание поста",
+  "image": "http://example.com/img.jpg"
+}
 ]

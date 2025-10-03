@@ -1,10 +1,12 @@
 const express = require("express");
 const moment = require("moment");
-const fs = require("fs");
+const fs = require("fs/promises");
 const path = require("path");
 
 const app = express();
 const PORT = 3000;
+
+app.use(express.json()); // для парсингу JSON з тіла запиту
 
 function getDate() {
   return moment().format("YYYY/MM/DD HH:mm:ss");
@@ -21,18 +23,11 @@ app.get("/timestamp", (req, res) => {
   });
 });
 
-app.get("/posts", (req, res) => {
-  const filePath = path.join(__dirname, "posts.json");
-
-  fs.readFile(filePath, "utf8", (err, data) => {
-    if (err) return res.status(500).json({ error: "Помилка при читанні файлу постів" });
-
-    let posts;
-    try {
-      posts = JSON.parse(data);
-    } catch {
-      return res.status(500).json({ error: "Помилка парсингу JSON" });
-    }
+app.get("/posts", async (req, res) => {
+  try {
+    const filePath = path.join(__dirname, "posts.json");
+    const data = await fs.readFile(filePath, "utf8");
+    let posts = JSON.parse(data);
 
     const skip = req.query.skip ? Number(req.query.skip) : 0;
     const take = req.query.take ? Number(req.query.take) : null;
@@ -49,21 +44,16 @@ app.get("/posts", (req, res) => {
     if (take !== null) result = result.slice(0, take);
 
     res.json(result);
-  });
+  } catch (error) {
+    res.status(500).json({ error: "Помилка при обробці запиту" });
+  }
 });
 
-app.get("/posts/:id", (req, res) => {
-  const filePath = path.join(__dirname, "posts.json");
-
-  fs.readFile(filePath, "utf8", (err, data) => {
-    if (err) return res.status(500).json({ error: "Помилка при читанні файлу постів" });
-
-    let posts;
-    try {
-      posts = JSON.parse(data);
-    } catch {
-      return res.status(500).json({ error: "Помилка парсингу JSON" });
-    }
+app.get("/posts/:id", async (req, res) => {
+  try {
+    const filePath = path.join(__dirname, "posts.json");
+    const data = await fs.readFile(filePath, "utf8");
+    const posts = JSON.parse(data);
 
     const id = Number(req.params.id);
     // якщо ID не число
@@ -74,87 +64,40 @@ app.get("/posts/:id", (req, res) => {
     if (!post) return res.status(404).json({ error: "Пост не знайдено" });
 
     res.json(post);
-  });
+  } catch (error) {
+    res.status(500).json({ error: "Помилка при обробці запиту" });
+  }
 });
 
-app.get("/users", (req, res) => {
-  const filePath = path.join(__dirname, "users.json");
+app.post("/posts", async (req, res) => {
+  try {
+    const { title, description, image } = req.body;
 
-  fs.readFile(filePath, "utf8", (err, data) => {
-    if (err) return res.status(500).json({ error: "Помилка при читанні файлу користувачів" });
-
-    let users;
-    try {
-      users = JSON.parse(data);
-    } catch {
-      return res.status(500).json({ error: "Помилка парсингу JSON" });
+    // якщо відсутнє поле title, description або image
+    if (!title || !description || !image) {
+      return res.status(422).json({ error: "title, description і image обов'язкові" });
     }
 
-    res.json(users);
-  });
-});
+    const filePath = path.join(__dirname, "posts.json");
+    const data = await fs.readFile(filePath, "utf8");
+    const posts = JSON.parse(data);
 
-app.get("/users/:id", (req, res) => {
-  const filePath = path.join(__dirname, "users.json");
+    const newPost = {
+      id: posts.length > 0 ? posts[posts.length - 1].id + 1 : 1,
+      title,
+      description,
+      image,
+      likes: 0,
+    };
 
-  fs.readFile(filePath, "utf8", (err, data) => {
-    if (err) return res.status(500).json({ error: "Помилка при читанні файлу користувачів" });
+    posts.push(newPost);
 
-    let users;
-    try {
-      users = JSON.parse(data);
-    } catch {
-      return res.status(500).json({ error: "Помилка парсингу JSON" });
-    }
+    await fs.writeFile(filePath, JSON.stringify(posts, null, 2), "utf8");
 
-    const id = Number(req.params.id);
-    // якщо ID не число
-    if (!Number.isInteger(id)) return res.status(400).json({ error: "ID має бути числом" });
-
-    const user = users.find(u => u.id === id);
-    // якщо користувача не знайдено
-    if (!user) return res.status(404).json({ error: "Користувача не знайдено" });
-
-    if (req.query.fields) {
-      const fields = req.query.fields.split(",");
-      const filteredUser = {};
-
-      fields.forEach(field => {
-        if (user[field] !== undefined) {
-          filteredUser[field] = user[field];
-        }
-      });
-
-      return res.json(filteredUser);
-    }
-
-    res.json(user);
-  });
-});
-
-app.get("/users/name/:name", (req, res) => {
-  const filePath = path.join(__dirname, "users.json");
-
-  fs.readFile(filePath, "utf8", (err, data) => {
-    if (err) return res.status(500).json({ error: "Помилка при читанні файлу користувачів" });
-
-    let users;
-    try {
-      users = JSON.parse(data);
-    } catch {
-      return res.status(500).json({ error: "Помилка парсингу JSON" });
-    }
-
-    const name = req.params.name.toLowerCase();
-    const matchedUsers = users.filter(u => u.name.toLowerCase() === name);
-
-    // якщо жодного користувача з таким ім’ям немає
-    if (matchedUsers.length === 0) {
-      return res.status(404).json({ error: "Користувачів з таким ім’ям не знайдено" });
-    }
-
-    res.json(matchedUsers);
-  });
+    res.status(201).json(newPost);
+  } catch (error) {
+    res.status(500).json({ error: "Помилка при створенні поста" });
+  }
 });
 
 app.listen(PORT, () => {
