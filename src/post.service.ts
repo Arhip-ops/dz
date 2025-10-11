@@ -1,12 +1,26 @@
-const fs = require("fs/promises");
-const path = require("path");
+import fs from "fs/promises";
+import path from "path";
+
+interface Post {
+  id: number;
+  title: string;
+  description: string;
+  image: string;
+  likes: number;
+}
+
+interface CreatePost {
+  title: string;
+  description: string;
+  image: string;
+}
 
 const filePath = path.join(__dirname, "../../../posts.json");
 
 const postService = {
-  async getAllPosts(skip, take) {
+  async getAllPosts(skip?: string, take?: string): Promise<Post[]> {
     const data = await fs.readFile(filePath, "utf8");
-    let posts = JSON.parse(data);
+    let posts: Post[] = JSON.parse(data);
 
     const skipNum = skip ? Number(skip) : 0;
     const takeNum = take ? Number(take) : null;
@@ -25,17 +39,17 @@ const postService = {
     return result;
   },
 
-  async getPostById(id) {
+  async getPostById(id: number): Promise<Post | undefined> {
     const data = await fs.readFile(filePath, "utf8");
-    const posts = JSON.parse(data);
-    return posts.find(p => p.id === id);
+    const posts: Post[] = JSON.parse(data);
+    return posts.find((p) => p.id === id);
   },
 
-  async createPost({ title, description, image }) {
+  async createPost({ title, description, image }: CreatePost) {
     const data = await fs.readFile(filePath, "utf8");
-    const posts = JSON.parse(data);
+    const posts: Post[] = JSON.parse(data);
 
-    const newPost = {
+    const newPost: Post = {
       id: posts.length > 0 ? posts[posts.length - 1].id + 1 : 1,
       title,
       description,
@@ -50,4 +64,4 @@ const postService = {
   },
 };
 
-module.exports = postService;
+export default postService;

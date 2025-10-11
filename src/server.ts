@@ -1,6 +1,5 @@
-const express = require("express");
-const path = require("path");
-const postRouter = require("./modules/post/post.router");
+import express from "express";
+import postRouter from "./post.router";
 
 const app = express();
 const PORT = 8000;
