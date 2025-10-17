@@ -1,8 +1,9 @@
-import express from "express";
-import postRouter from "./post.router";
+const express = require("express");
+const path = require("path");
+const postRouter = require("./modules/post/post.router");
 
 const app = express();
-const PORT = 8000;
+const PORT = 3000;
 
 app.use(express.json());
 

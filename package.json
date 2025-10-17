@@ -2,14 +2,15 @@
   "name": "dz_2",
   "version": "1.0.0",
   "description": "",
-  "main": "dz_2.js",
+  "main": "src/server.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "node dz_2.js"
+    "start": "node src/server.js"
   },
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "expres": "^0.0.5",
     "express": "^5.1.0",
     "moment": "^2.30.1"
   },
