@@ -1,17 +1,18 @@
-const postService = require("./post.service");
+import { Request, Response } from "express";
+import { postService } from "./post.service";
 
 const postController = {
-  async getAllPosts(req, res) {
+  async getAllPosts(req: Request, res: Response): Promise<void> {
     try {
       const { skip, take } = req.query;
-      const result = await postService.getAllPosts(skip, take);
+      const result = await postService.getAllPosts(skip as string, take as string);
       res.json(result);
     } catch (error) {
       res.status(500).json({ error: "Помилка при отриманні постів" });
     }
   },
 
-  async getPostById(req, res) {
+  async getPostById(req: Request, res: Response): Promise<void> {
     try {
       const id = Number(req.params.id);
       // якщо ID не число
@@ -27,7 +28,7 @@ const postController = {
     }
   },
 
-  async createPost(req, res) {
+  async createPost(req: Request, res: Response): Promise<void> {
     try {
       const { title, description, image } = req.body;
       // якщо відсутнє поле title, description або image
@@ -43,4 +44,4 @@ const postController = {
   },
 };
 
-module.exports = postController;
+export default postController;
